@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GameHack Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    
+    <!-- Adsterra Head Code -->
+    <script data-cfasync="false">
+        var atOptions = {
+            'key' : '8e6ea130fc89880d226a8f184b545abb',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+        };
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            padding: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #111;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #ff0000;
+            margin-bottom: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 15px 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff0000;
+        }
+        
+        .main-title {
+            color: #ff0000;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #00ffff;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #00ff00;
+            margin: 3px;
+        }
+        
+        /* Ad Section */
+        .ad-section {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: #222;
+            border-radius: 8px;
+            border: 1px solid #ff9900;
+        }
+        
+        .ad-label {
+            color: #ff9900;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .ad-timer {
+            color: #888;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        /* Ad Counter */
+        .counter-box {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 153, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #ff9900;
+        }
+        
+        .counter-num {
+            font-size: 32px;
+            color: #00ff00;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .counter-text {
+            color: #fff;
+            font-size: 13px;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff9900);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 4px;
+        }
+        
+        /* Download Button */
+        .download-btn {
+            display: block;
+            width: 100%;
+            background: #444;
+            color: #888;
+            border: none;
+            border-radius: 25px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: not-allowed;
+            margin: 15px 0;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .download-btn.active {
+            background: linear-gradient(to right, #ff0000, #ff6600);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .download-btn.active:hover {
+            background: linear-gradient(to right, #ff6600, #ff0000);
+        }
+        
+        /* Files List */
+        .files-list {
+            display: none;
+            margin-top: 15px;
+            background: #222;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            background: #333;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid #ff9900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-name {
+            color: #fff;
+            font-size: 13px;
+        }
+        
+        .download-link {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        /* Download Modal */
+        .download-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .download-content {
+            background: #222;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+            text-align: center;
+        }
+        
+        .download-title {
+            color: #00ff00;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 8px;
+        }
+        
+        .download-progress {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .download-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff9900);
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+        
+        .download-status {
+            color: #00ff00;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .close-btn {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        /* Expiry Badge */
+        .expiry-badge {
+            display: inline-block;
+            background: rgba(255, 153, 0, 0.1);
+            border: 1px solid #ff9900;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            color: #ff9900;
+            margin-top: 3px;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #00ff00;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Small Screen */
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
+                margin: 5px;
+            }
+            
+            .main-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="main-title">GAMEHACK PRO</div>
+            <div class="subtitle">Premium Game Files & Mods 2025</div>
+            <div>
+                <span class="badge">Developer: Sojib</span>
+                <span class="badge">✅ 100% Working</span>
+                <span class="badge">🔥 Latest</span>
+            </div>
+        </div>
+        
+        <!-- Ad Counter -->
+        <div class="counter-box">
+            <div class="counter-text">WATCH ADS TO UNLOCK</div>
+            <div class="counter-num" id="adCounter">5</div>
+            <div class="counter-text" id="counterText">5 ads remaining</div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="counter-text" id="progressText">0/5 ads watched</div>
+        </div>
+        
+        <!-- Ad Section -->
+        <div class="ad-section" id="adSection">
+            <div class="ad-label">📢 ADVERTISEMENT</div>
+            <div id="adContainer" style="min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                <!-- Ad will load here -->
+            </div>
+            <div class="ad-timer">
+                Ad closes in <span id="timer">10</span> seconds
+            </div>
+        </div>
+        
+        <!-- Download Button -->
+        <button class="download-btn" id="downloadBtn" disabled onclick="showFiles()">
+            🔒 WATCH 5 ADS TO UNLOCK
+        </button>
+        
+        <!-- Files List -->
+        <div class="files-list" id="filesList">
+            <div style="color:#00ff00; text-align:center; margin-bottom:10px; font-size:14px;">
+                ✅ ALL FILES UNLOCKED
+            </div>
+            <div id="hacksContainer">
+                <div class="spinner" style="display: none;" id="loadingSpinner"></div>
+                <div style="text-align:center; color:#888; padding:20px;" id="noHacksMessage">
+                    Loading hacks from server...
+                </div>
+            </div>
+            <div style="color:#888; text-align:center; margin-top:10px; font-size:11px;">
+                ⚡ Files auto-delete after expiry
+            </div>
+        </div>
+    </div>
+    
+    <!-- Download Modal -->
+    <div class="download-modal" id="downloadModal">
+        <div class="download-content">
+            <h3 class="download-title">📥 DOWNLOADING</h3>
+            <div class="download-progress">
+                <div class="download-progress-fill" id="downloadProgress"></div>
+            </div>
+            <div class="download-status" id="downloadStatus">Preparing download...</div>
+            <div id="downloadAdContainer" style="min-height: 250px; margin: 15px 0;"></div>
+            <button class="close-btn" onclick="closeDownloadModal()" id="closeBtn" style="display:none;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // =========== FIREBASE CONFIGURATION ===========
+        const firebaseConfig = {
+            apiKey: "AIzaSyCSoTqqSC_NqigWrHwE4Q8IUvWRP9TrxG8",
+            authDomain: "top-up-4db01.firebaseapp.com",
+            databaseURL: "https://top-up-4db01-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "top-up-4db01",
+            storageBucket: "top-up-4db01.appspot.com",
+            messagingSenderId: "264548197473",
+            appId: "1:264548197473:android:4c986618c48182125d7620"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const storage = firebase.storage();
+        
+        // Adsterra Configuration
+        const ADSTERRA_KEY = '8e6ea130fc89880d226a8f184b545abb';
+        
+        // System Variables
+        let adsWatched = 0;
+        const totalAds = 5;
+        let timerInterval;
+        let currentTime = 10;
+        let sessionActive = false;
+        let hacksList = [];
+        let currentDownloadFile = null;
+        
+        // Initialize Application
+        function initializeApp() {
+            initSession();
+            loadAdsterraAd();
+            startAdTimer();
+            
+            // Load hacks from Firebase when files are shown
+            document.getElementById('filesList').addEventListener('click', function() {
+                if (adsWatched >= totalAds && sessionActive) {
+                    loadHacksFromFirebase();
+                }
+            });
+            
+            // Check for expired hacks every hour
+            setInterval(checkExpiredHacks, 3600000);
+        }
+        
+        // =========== FIREBASE FUNCTIONS ===========
+        async function loadHacksFromFirebase() {
+            const hacksContainer = document.getElementById('hacksContainer');
+            const noHacksMessage = document.getElementById('noHacksMessage');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            // Show loading
+            noHacksMessage.textContent = 'Loading hacks from server...';
+            loadingSpinner.style.display = 'block';
+            
+            try {
+                // Read hacks from Firebase Realtime Database
+                const hacksRef = database.ref('hacks');
+                const snapshot = await hacksRef.once('value');
+                
+                if (snapshot.exists()) {
+                    hacksList = [];
+                    const hacksData = snapshot.val();
+                    
+                    // Convert object to array
+                    for (const hackId in hacksData) {
+                        const hack = hacksData[hackId];
+                        hack.id = hackId;
+                        
+                        // Check if hack is expired
+                        if (hack.expiry_date && !isExpired(hack.expiry_date)) {
+                            hacksList.push(hack);
+                        }
+                    }
+                    
+                    // Update UI
+                    updateHacksDisplay();
+                    loadingSpinner.style.display = 'none';
+                } else {
+                    noHacksMessage.textContent = 'No hacks available yet. Please check back later.';
+                    loadingSpinner.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading hacks:', error);
+                noHacksMessage.textContent = 'Error loading hacks. Please try again.';
+                loadingSpinner.style.display = 'none';
+            }
+        }
+        
+        function updateHacksDisplay() {
+            const hacksContainer = document.getElementById('hacksContainer');
+            const noHacksMessage = document.getElementById('noHacksMessage');
+            
+            if (hacksList.length === 0) {
+                noHacksMessage.textContent = 'No hacks available yet. Please check back later.';
+                noHacksMessage.style.display = 'block';
+                return;
+            }
+            
+            // Clear container
+            hacksContainer.innerHTML = '';
+            noHacksMessage.style.display = 'none';
+            
+            // Add each hack
+            hacksList.forEach(hack => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                // Calculate days remaining
+                const daysRemaining = getDaysRemaining(hack.expiry_date);
+                const expiryText = daysRemaining > 0 ? 
+                    `Expires in ${daysRemaining} day${daysRemaining > 1 ? 's' : ''}` : 
+                    'Expires today';
+                
+                fileItem.innerHTML = `
+                    <div style="flex: 1;">
+                        <div class="file-name">${hack.title || 'Unknown Hack'}</div>
+                        <div style="color:#888; font-size:10px; margin-top:2px;">
+                            Size: ${hack.file_size || 'Unknown'} | Added: ${hack.date_added || 'N/A'}
+                        </div>
+                        <div class="expiry-badge">${expiryText}</div>
+                    </div>
+                    <button class="download-link" onclick="downloadHack('${hack.id}')" 
+                            data-filename="${hack.file_name || 'hack.apk'}"
+                            data-storagepath="${hack.storage_path || ''}">
+                        ⬇️
+                    </button>
+                `;
+                hacksContainer.appendChild(fileItem);
+            });
+        }
+        
+        async function downloadHack(hackId) {
+            const hack = hacksList.find(h => h.id === hackId);
+            if (!hack) {
+                alert('Hack not found!');
+                return;
+            }
+            
+            currentDownloadFile = hack;
+            
+            // Show download modal
+            showDownloadModal();
+            
+            // Step 1: Show ad before download
+            await showDownloadAd();
+            
+            // Step 2: Download file from Firebase Storage
+            await downloadFileFromStorage(hack);
+        }
+        
+        async function downloadFileFromStorage(hack) {
+            try {
+                const downloadStatus = document.getElementById('downloadStatus');
+                const downloadProgress = document.getElementById('downloadProgress');
+                const closeBtn = document.getElementById('closeBtn');
+                
+                // Get storage path
+                const storagePath = hack.storage_path || `hacks/${hack.file_name || 'hack.apk'}`;
+                const storageRef = storage.ref(storagePath);
+                
+                // Get download URL
+                downloadStatus.textContent = 'Getting download link...';
+                downloadProgress.style.width = '30%';
+                
+                const downloadURL = await storageRef.getDownloadURL();
+                
+                // Create download link
+                downloadStatus.textContent = 'Starting download...';
+                downloadProgress.style.width = '60%';
+                
+                const link = document.createElement('a');
+                link.href = downloadURL;
+                link.download = hack.file_name || 'hack.apk';
+                link.target = '_blank';
+                
+                // Trigger download
+                downloadStatus.textContent = 'Download started!';
+                downloadProgress.style.width = '100%';
+                
+                setTimeout(() => {
+                    link.click();
+                    
+                    // Show success message
+                    downloadStatus.textContent = '✅ Download completed!';
+                    downloadStatus.style.color = '#00ff00';
+                    
+                    // Show close button after 3 seconds
+                    setTimeout(() => {
+                        closeBtn.style.display = 'block';
+                    }, 3000);
+                    
+                    // Track download in Firebase
+                    trackDownload(hack.id);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                document.getElementById('downloadStatus').textContent = '❌ Download failed!';
+                document.getElementById('downloadStatus').style.color = '#ff0000';
+                document.getElementById('closeBtn').style.display = 'block';
+            }
+        }
+        
+        async function trackDownload(hackId) {
+            try {
+                // Increment download count in Firebase
+                const downloadsRef = database.ref(`hacks/${hackId}/downloads`);
+                const snapshot = await downloadsRef.once('value');
+                const currentDownloads = snapshot.val() || 0;
+                
+                await downloadsRef.set(currentDownloads + 1);
+                
+                // Also log download event
+                const downloadLogRef = database.ref('download_logs').push();
+                await downloadLogRef.set({
+                    hack_id: hackId,
+                    hack_name: currentDownloadFile?.title || 'Unknown',
+                    timestamp: new Date().toISOString(),
+                    user_agent: navigator.userAgent
+                });
+            } catch (error) {
+                console.error('Error tracking download:', error);
+            }
+        }
+        
+        function checkExpiredHacks() {
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            hacksList = hacksList.filter(hack => {
+                if (!hack.expiry_date) return true;
+                return hack.expiry_date >= currentDate;
+            });
+            
+            if (hacksList.length > 0) {
+                updateHacksDisplay();
+            }
+        }
+        
+        function isExpired(expiryDate) {
+            if (!expiryDate) return false;
+            
+            const today = new Date().toISOString().split('T')[0];
+            return expiryDate < today;
+        }
+        
+        function getDaysRemaining(expiryDate) {
+            if (!expiryDate) return 0;
+            
+            const today = new Date();
+            const expiry = new Date(expiryDate);
+            const diffTime = expiry - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays > 0 ? diffDays : 0;
+        }
+        
+        // =========== AD SYSTEM ===========
+        function loadAdsterraAd() {
+            const adContainer = document.getElementById('adContainer');
+            if (!adContainer) return;
+            
+            adContainer.innerHTML = '';
+            
+            const adScript = `
+                <script data-cfasync="false">
+                    atOptions = {
+                        'key' : '${ADSTERRA_KEY}',
+                        'format' : 'iframe',
+                        'height' : 250,
+                        'width' : 300,
+                        'params' : {}
+                    };
+                <\/script>
+                <script data-cfasync="false" type="text/javascript" 
+                        src="https://www.highperformanceformat.com/${ADSTERRA_KEY}/invoke.js"><\/script>
+            `;
+            
+            adContainer.innerHTML = adScript;
+        }
+        
+        function showDownloadAd() {
+            return new Promise((resolve) => {
+                const downloadAdContainer = document.getElementById('downloadAdContainer');
+                downloadAdContainer.innerHTML = '';
+                
+                const adScript = `
+                    <script data-cfasync="false">
+                        atOptions = {
+                            'key' : '${ADSTERRA_KEY}',
+                            'format' : 'iframe',
+                            'height' : 250,
+                            'width' : 300,
+                            'params' : {}
+                        };
+                    <\/script>
+                    <script data-cfasync="false" type="text/javascript" 
+                            src="https://www.highperformanceformat.com/${ADSTERRA_KEY}/invoke.js"><\/script>
+                `;
+                
+                downloadAdContainer.innerHTML = adScript;
+                
+                // Show ad for 5 seconds then continue
+                setTimeout(() => {
+                    document.getElementById('downloadAdContainer').innerHTML = '';
+                    resolve();
+                }, 5000);
+            });
+        }
+        
+        function refreshAd() {
+            const adContainer = document.getElementById('adContainer');
+            if (adContainer) {
+                adContainer.innerHTML = '';
+                setTimeout(loadAdsterraAd, 500);
+            }
+        }
+        
+        // =========== SESSION MANAGEMENT ===========
+        function initSession() {
+            const lastSession = localStorage.getItem('lastSessionData');
+            if (lastSession) {
+                const sessionData = JSON.parse(lastSession);
+                const timeSinceLastActivity = Date.now() - sessionData.lastActivity;
+                
+                if (timeSinceLastActivity > 1000 && sessionData.adsWatched > 0) {
+                    resetProgressSilently();
+                } else {
+                    adsWatched = sessionData.adsWatched || 0;
+                    sessionActive = true;
+                }
+            }
+            
+            updateAdDisplay();
+            saveSession();
+        }
+        
+        function saveSession() {
+            const sessionData = {
+                adsWatched: adsWatched,
+                lastActivity: Date.now()
+            };
+            localStorage.setItem('lastSessionData', JSON.stringify(sessionData));
+        }
+        
+        function resetProgressSilently() {
+            adsWatched = 0;
+            sessionActive = false;
+            updateAdDisplay();
+            saveSession();
+            document.getElementById('filesList').style.display = 'none';
+            document.getElementById('downloadBtn').style.display = 'block';
+        }
+        
+        // =========== AD TIMER ===========
+        function startAdTimer() {
+            clearInterval(timerInterval);
+            currentTime = 10;
+            const timerElement = document.getElementById('timer');
+            
+            timerInterval = setInterval(() => {
+                currentTime--;
+                timerElement.textContent = currentTime;
+                
+                if (currentTime <= 0) {
+                    clearInterval(timerInterval);
+                    completeAd();
+                }
+            }, 1000);
+        }
+        
+        function completeAd() {
+            if (adsWatched >= totalAds) return;
+            
+            if (!sessionActive) {
+                sessionActive = true;
+            }
+            
+            adsWatched++;
+            saveSession();
+            updateAdDisplay();
+            
+            showMessage(`✅ Ad ${adsWatched}/${totalAds} watched!`);
+            
+            if (adsWatched < totalAds) {
+                setTimeout(() => {
+                    refreshAd();
+                    startAdTimer();
+                }, 2000);
+            } else {
+                document.getElementById('adSection').style.display = 'none';
+            }
+        }
+        
+        function updateAdDisplay() {
+            const remaining = totalAds - adsWatched;
+            const progressPercent = (adsWatched / totalAds) * 100;
+            
+            document.getElementById('adCounter').textContent = remaining;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `${adsWatched}/${totalAds} ads watched`;
+            
+            if (remaining > 0) {
+                document.getElementById('counterText').textContent = `${remaining} ads remaining`;
+            } else {
+                document.getElementById('counterText').innerHTML = '<span style="color:#00ff00">✅ Ready!</span>';
+            }
+            
+            const btn = document.getElementById('downloadBtn');
+            if (adsWatched >= totalAds && sessionActive) {
+                btn.disabled = false;
+                btn.classList.add('active');
+                btn.textContent = '✅ UNLOCK ALL FILES';
+            } else {
+                btn.disabled = true;
+                btn.classList.remove('active');
+                btn.textContent = `🔒 WATCH ${remaining} MORE AD${remaining > 1 ? 'S' : ''}`;
+            }
+        }
+        
+        // =========== FILE DISPLAY ===========
+        function showFiles() {
+            if (adsWatched >= totalAds && sessionActive) {
+                document.getElementById('filesList').style.display = 'block';
+                document.getElementById('downloadBtn').style.display = 'none';
+                
+                // Load hacks from Firebase
+                loadHacksFromFirebase();
+                
+                document.getElementById('filesList').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else if (!sessionActive) {
+                alert("⚠️ Your session has expired! Please watch 5 ads again.");
+                resetProgressSilently();
+            } else {
+                alert(`⚠️ Watch ${totalAds - adsWatched} more ad${totalAds - adsWatched > 1 ? 's' : ''} to unlock!`);
+            }
+        }
+        
+        // =========== DOWNLOAD MODAL ===========
+        function showDownloadModal() {
+            document.getElementById('downloadModal').style.display = 'flex';
+            document.getElementById('downloadProgress').style.width = '0%';
+            document.getElementById('downloadStatus').textContent = 'Preparing download...';
+            document.getElementById('downloadStatus').style.color = '#00ff00';
+            document.getElementById('closeBtn').style.display = 'none';
+        }
+        
+        function closeDownloadModal() {
+            document.getElementById('downloadModal').style.display = 'none';
+            document.getElementById('downloadAdContainer').innerHTML = '';
+        }
+        
+        // =========== UTILITY FUNCTIONS ===========
+        function showMessage(msg) {
+            const msgEl = document.createElement('div');
+            msgEl.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: #00ff00;
+                color: #000;
+                padding: 8px 15px;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.3s;
+                max-width: 80%;
+                text-align: center;
+            `;
+            msgEl.textContent = msg;
+            document.body.appendChild(msgEl);
+            
+            setTimeout(() => msgEl.remove(), 2000);
+        }
+        
+        // Initialize when page loads
+        window.onload = initializeApp;
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
